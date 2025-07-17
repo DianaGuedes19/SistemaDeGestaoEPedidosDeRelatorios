@@ -18,8 +18,11 @@ import org.mockito.Mock;
 
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.List;
 
 
 import static org.mockito.ArgumentMatchers.any;
@@ -86,4 +89,56 @@ class orderControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(content().json(objectMapper.writeValueAsString(resp)));
     }
+
+    @Test
+    void getAllOrders_deveRetornar200EListaDeDTOs() throws Exception {
+        // Arrange
+        orderDTOResponse o1 = new orderDTOResponse();
+        o1.setId(1L);
+        o1.setClientName("Alice");
+        o1.setClientEmail("alice@example.com");
+        o1.setCreationDate(LocalDate.of(2025, 7, 17));
+        o1.setStatus(State.PENDENTE);
+        o1.setValue(50.0);
+
+        orderDTOResponse o2 = new orderDTOResponse();
+        o2.setId(2L);
+        o2.setClientName("Bob");
+        o2.setClientEmail("bob@example.com");
+        o2.setCreationDate(LocalDate.of(2025, 7, 18));
+        o2.setStatus(State.PENDENTE);
+        o2.setValue(75.5);
+
+        List<orderDTOResponse> lista = Arrays.asList(o1, o2);
+
+        when(orderService1.getAllOders()).thenReturn(lista);
+
+        // Act & Assert
+        mockMvc.perform(get("/orders/allOrders")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(lista)));
+    }
+
+    @Test
+    void getOrderByID_deveRetornar200EOrderDTO() throws Exception {
+        // Arrange
+        Long id = 1L;
+        orderDTOResponse dto = new orderDTOResponse();
+        dto.setId(id);
+        dto.setClientName("Diana");
+        dto.setClientEmail("diana@gmail.com");
+        dto.setCreationDate(LocalDate.of(2025,7,17));
+        dto.setStatus(State.PENDENTE);
+        dto.setValue(130.2);
+
+        when(orderService1.getOrderByID(id)).thenReturn(dto);
+
+        // Act & Assert
+        mockMvc.perform(get("/orders/{id}", id)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(dto)));
+    }
+
 }
