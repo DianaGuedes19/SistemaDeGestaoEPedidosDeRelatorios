@@ -36,4 +36,12 @@ public class orderServiceImpl implements orderService {
         List<Order> order = orderRepository1.findAll();
         return order.stream().map(orderMapper::toDTOResponse).collect(Collectors.toList());
     }
+
+    @Override
+    public orderDTOResponse getOrderByID(Long id) {
+
+        Order order1 = orderRepository1.findById(id).orElseThrow(() -> new RuntimeException("Order not found " + id));
+
+        return orderMapper.toDTOResponse(order1);
+    }
 }

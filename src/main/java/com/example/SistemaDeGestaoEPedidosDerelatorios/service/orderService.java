@@ -10,4 +10,5 @@ public interface orderService {
 
     orderDTOResponse createOrder (orderDTORequest order);
     List<orderDTOResponse> getAllOders ();
+    orderDTOResponse getOrderByID (Long id);
 }

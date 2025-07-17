@@ -17,6 +17,8 @@ import org.mockito.Spy;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -82,6 +84,34 @@ class orderServiceImplTest {
         assertNotNull(orderResult);
         assertEquals(2, orderResult.size());
 
+    }
+
+
+    @Test
+    void getOrderByID_deveRetornarDTOQuandoExistir() {
+        // Arrange
+        Long id = 42L;
+        Order domain = new Order(42L, "Alice", "alice@example.com",LocalDate.of(2025, 7, 17),State.PENDENTE,99.99);
+
+        when(orderRepository.findById(id)).thenReturn(Optional.of(domain));
+
+        // Act
+        orderDTOResponse result = orderService.getOrderByID(id);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("Alice",result.getClientName());
+}
+
+    @Test
+    void getOrderByID_deveLancarExceptionQuandoNaoExistir() {
+        // Arrange
+        Long id = 99L;
+        when(orderRepository.findById(id)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        RuntimeException ex = assertThrows(RuntimeException.class, () -> orderService.getOrderByID(id));
+        assertEquals("Order not found " + id, ex.getMessage());
 
     }
 }
