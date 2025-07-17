@@ -1,7 +1,8 @@
-package com.example.SistemaDeGestaoEPedidosDerelatorios.domain;
+package com.example.SistemaDeGestaoEPedidosDerelatorios.DTO;
 
-import jakarta.persistence.*;
-import jdk.vm.ci.meta.Local;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,14 +10,12 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Order {
+public class orderDTOResponse {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
+    @Setter
     private Long id;
 
     @Getter
@@ -39,6 +38,4 @@ public class Order {
     @Getter
     @Setter
     private double value;
-
-
 }

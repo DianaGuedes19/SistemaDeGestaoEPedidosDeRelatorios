@@ -3,19 +3,12 @@ package com.example.SistemaDeGestaoEPedidosDerelatorios.DTO;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
-@AllArgsConstructor
-@NoArgsConstructor
-public class orderDTO {
-
-    @Getter
-    private Long id;
+public class orderDTORequest {
 
     @Getter
     @Setter
