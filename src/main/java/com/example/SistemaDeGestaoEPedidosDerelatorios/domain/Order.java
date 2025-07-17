@@ -1,10 +1,7 @@
 package com.example.SistemaDeGestaoEPedidosDerelatorios.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -12,6 +9,7 @@ import java.time.LocalDate;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -35,21 +33,18 @@ public class Order {
     @Getter
     @Setter
     @NotNull (message = "LocalDate cannot be null")
-    @NotBlank (message = "LocalDate cannot be in blank")
     private LocalDate creationDate;
 
     @Getter
     @Setter
     @NotNull (message = "Status cannot be null")
-    @NotBlank (message = "Status cannot be in blank")
     @Enumerated(EnumType.STRING)
     private State status;
 
     @Getter
     @Setter
     @NotNull (message = "Value cannot be null")
-    @NotBlank (message = "Value cannot be in blank")
-    @PositiveOrZero(message = "Value cannot be 0 or below")
+    @Positive(message = "Value cannot be 0 or below")
     private double value;
 
 
