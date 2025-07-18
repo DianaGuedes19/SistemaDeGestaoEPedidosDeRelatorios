@@ -1,13 +1,9 @@
 package com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.errorLog;
-
-import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.Order;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
