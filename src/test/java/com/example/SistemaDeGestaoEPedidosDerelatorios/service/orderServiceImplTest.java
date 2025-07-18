@@ -2,6 +2,8 @@ package com.example.SistemaDeGestaoEPedidosDerelatorios.service;
 
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTORequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTOResponse;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.ValidationResponse;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.validationRequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.Order;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.mapper.orderMapper;
@@ -13,6 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.Spy;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,7 +26,7 @@ import java.util.Optional;
 
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,13 +35,19 @@ class orderServiceImplTest {
     @Mock
     private orderRepository orderRepository;
 
+    @Mock
+    private RestTemplate restTemplate;
+
+    private final String validationUrl = "https://run.mocky.io/v3/15b55d39-9a2c-4085-b542-05b098812a16";
+
 
     private orderServiceImpl orderService;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        orderService = new orderServiceImpl(orderRepository);
+        orderService = new orderServiceImpl(orderRepository,restTemplate, validationUrl);
+
     }
 
     @Test
@@ -51,9 +62,25 @@ class orderServiceImplTest {
         req.setValue(130.2);
 
 
-        Order entity = orderMapper.toOrderEntity(req);
+        ValidationResponse fakeResp = new ValidationResponse(true, "Existing Client");
+        ResponseEntity<ValidationResponse> fakeEntity = ResponseEntity.ok(fakeResp);
+        when(restTemplate.postForEntity(eq(validationUrl), any(validationRequest.class), eq(ValidationResponse.class)))
+                .thenReturn(fakeEntity);
 
-        Order saved = new Order(1L,entity.getClientName(),entity.getClientEmail(),entity.getCreationDate(),entity.getStatus(),entity.getValue());
+
+        Order toSave = orderMapper.toOrderEntity(req);
+
+        toSave.setClientValid(true);
+        toSave.setValidationMessage("Existing Client");
+        Order saved = new Order(1L,
+                toSave.getClientName(),
+                toSave.getClientEmail(),
+                toSave.getCreationDate(),
+                toSave.getStatus(),
+                toSave.getValue());
+        saved.setClientValid(true);
+        saved.setValidationMessage("Existing Client");
+
         when(orderRepository.save(any(Order.class))).thenReturn(saved);
 
         // Act
@@ -62,6 +89,33 @@ class orderServiceImplTest {
         // Assert
         assertNotNull(result);
         assertEquals("Diana", result.getClientName());
+    }
+
+    @Test
+    void createOrder_whenValidationServiceFails_shouldReturnDtoWithError() {
+        // Arrange
+        orderDTORequest req = new orderDTORequest();
+        req.setClientName("Diana");
+        req.setClientEmail("diana@gmail.com");
+        req.setCreationDate(LocalDate.of(2025,7,17));
+        req.setStatus(State.PENDENTE);
+        req.setValue(130.2);
+
+        when(restTemplate.postForEntity(anyString(), any(validationRequest.class), eq(ValidationResponse.class))).thenThrow(new RestClientException("Timeout ao chamar validação"));
+
+        Order saved = new Order(42L,req.getClientName(),req.getClientEmail(),req.getCreationDate(),req.getStatus(),req.getValue(),false,"Validation Error"  );
+
+
+        when(orderRepository.save(any(Order.class))).thenReturn(saved);
+
+        // Act
+        orderDTOResponse result = orderService.createOrder(req);
+
+        // Assert
+        assertNotNull(result);
+        assertFalse(result.getClientValid());
+        assertTrue(result.getValidationMessage().startsWith("Validation Error"));
+
     }
 
     @Test
