@@ -47,5 +47,22 @@ public class Order {
     @Positive(message = "Value cannot be 0 or below")
     private double value;
 
+    @Getter
+    @Setter
+    private Boolean clientValid;
 
+    @Getter
+    @Setter
+    private String validationMessage;
+
+
+    // Constructor with the firsts parameters before the validation of users
+    public Order(Long id, String clientName, String clientEmail, LocalDate creationDate, State status, double value) {
+        this.id = id;
+        this.clientName = clientName;
+        this.clientEmail = clientEmail;
+        this.creationDate = creationDate;
+        this.status = status;
+        this.value = value;
+    }
 }
