@@ -64,7 +64,7 @@ class ErrorReportServiceTest {
     @Test
     void sendDailyErrorReport_shouldNotSend_whenNoLogs() {
         // Arrange
-        when(errorLogRepo.findByTimestampBetween(
+        when(errorLogRepo.findByOccurredAtBetween(
                 any(LocalDateTime.class),
                 any(LocalDateTime.class))
         )
@@ -94,7 +94,7 @@ class ErrorReportServiceTest {
         log2.setMessage("invalid id");
 
         List<ErrorLog> logs = Arrays.asList(log1, log2);
-        when(errorLogRepo.findByTimestampBetween(
+        when(errorLogRepo.findByOccurredAtBetween(
                 any(LocalDateTime.class),
                 any(LocalDateTime.class))
         ).thenReturn(logs);

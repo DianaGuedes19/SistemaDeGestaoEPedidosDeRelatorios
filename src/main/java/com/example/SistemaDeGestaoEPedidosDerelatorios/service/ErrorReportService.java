@@ -4,6 +4,7 @@ import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.ErrorLog;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.repository.errorLogRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,13 +26,14 @@ public class ErrorReportService {
         this.mailSender = mailSender;
     }
 
+    @Scheduled(cron = "0 0 0 * * *")
     public void sendDailyErrorReport() {
 
         LocalDate today = LocalDate.now();
         LocalDateTime from = today.minusDays(1).atStartOfDay();
         LocalDateTime to   = today.atStartOfDay();
 
-        List<ErrorLog> logs = errorLogRepo.findByTimestampBetween(from, to);
+        List<ErrorLog> logs = errorLogRepo.findByOccurredAtBetween(from, to);
         if (logs.isEmpty()) {
             return;
         }

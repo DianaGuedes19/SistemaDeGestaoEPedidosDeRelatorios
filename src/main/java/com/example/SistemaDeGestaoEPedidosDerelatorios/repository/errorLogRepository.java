@@ -7,6 +7,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface errorLogRepository extends JpaRepository<ErrorLog,Long> {
-    List<ErrorLog> findByTimestampBetween(LocalDateTime from, LocalDateTime to);
+    List<ErrorLog> findByOccurredAtBetween(LocalDateTime from, LocalDateTime to);
 
 }
