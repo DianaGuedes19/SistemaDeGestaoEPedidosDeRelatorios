@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -72,7 +73,12 @@ public class orderServiceImpl implements orderService {
     }
 
     @Override
-    public List<orderDTOResponse> findByState(State status) {
-        return orderRepository1.findByState(status).stream().map(orderMapper::toDTOResponse).collect(Collectors.toList());
+    public List<orderDTOResponse> findByStatus(State status) {
+        return orderRepository1.findByStatus(status).stream().map(orderMapper::toDTOResponse).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<orderDTOResponse> findByCreationDate(LocalDate date) {
+        return orderRepository1.findByCreationDate(date).stream().map(orderMapper::toDTOResponse).collect(Collectors.toList());
     }
 }

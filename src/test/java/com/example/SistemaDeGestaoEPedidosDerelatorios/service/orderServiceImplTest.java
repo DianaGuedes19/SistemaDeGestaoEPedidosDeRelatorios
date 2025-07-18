@@ -162,11 +162,11 @@ class orderServiceImplTest {
         Order o2 = new Order(2L, "CliB", "b@exa.com", LocalDate.of(2025,7,19), State.PENDENTE, 20.0);
         List<Order> domainList = Arrays.asList(o1, o2);
 
-        when(orderRepository.findByState(State.PENDENTE))
+        when(orderRepository.findByStatus(State.PENDENTE))
                 .thenReturn(domainList);
 
         // Act
-        List<orderDTOResponse> result = orderService.findByState(State.PENDENTE);
+        List<orderDTOResponse> result = orderService.findByStatus(State.PENDENTE);
 
         // Assert
         assertNotNull(result);
@@ -177,14 +177,49 @@ class orderServiceImplTest {
     @Test
     void findByState_returnsEmptyListWhenNoneFound() {
         // Arrange
-        when(orderRepository.findByState(State.PENDENTE))
+        when(orderRepository.findByStatus(State.PENDENTE))
                 .thenReturn(Collections.emptyList());
 
         // Act
-        List<orderDTOResponse> result = orderService.findByState(State.PENDENTE);
+        List<orderDTOResponse> result = orderService.findByStatus(State.PENDENTE);
 
         // Assert
         assertNotNull(result);
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    void findByCreationDate_returnsDtosWhenFound() {
+        // Arrange
+        LocalDate targetDate = LocalDate.of(2025, 7, 18);
+
+        Order o1 = new Order(1L, "CliA", "a@exa.com", targetDate, State.PENDENTE, 10.0);
+        Order o2 = new Order(2L, "CliB", "b@exa.com", targetDate, State.APROVADO, 20.0);
+        List<Order> domainList = Arrays.asList(o1, o2);
+
+        when(orderRepository.findByCreationDate(targetDate)).thenReturn(domainList);
+
+        // Act
+        List<orderDTOResponse> result = orderService.findByCreationDate(targetDate);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.stream().allMatch(dto -> dto.getCreationDate().equals(targetDate)));
+    }
+
+    @Test
+    void findByCreationDate_returnsEmptyListWhenNoneFound() {
+        // Arrange
+        LocalDate targetDate = LocalDate.of(2025, 1, 1);
+        when(orderRepository.findByCreationDate(targetDate)).thenReturn(Collections.emptyList());
+
+        // Act
+        List<orderDTOResponse> result = orderService.findByCreationDate(targetDate);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
 }
