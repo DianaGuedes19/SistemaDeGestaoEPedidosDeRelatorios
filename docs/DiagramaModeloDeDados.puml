@@ -1,0 +1,43 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+class Client{
+ID (PK)
+Nome
+Email
+}
+
+class Order{
+ID (PK)
+ClientName
+ClientEmail
+CreationDate
+Value
+ClientValid
+ValidationMessage
+ClientID (FK)
+}
+
+class OrderStatusHistory{
+ID (PK)
+OrderId (FK)
+OldState
+NewState
+}
+
+class ErrorLog{
+ID (PK)
+OrderId (FK)
+Message
+LoggedAt
+}
+
+
+
+Client "1" -- "*" Order
+Order "1" -- "*" ErrorLog
+Order "1" -- "1..*" OrderStatusHistory
+
+
+
+@enduml
