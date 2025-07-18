@@ -17,12 +17,10 @@ public class ErrorLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Getter
-    @Column(name = "ErrorId")
     private Long id;
 
     @Getter
     @Setter
-    @Column(name = "OccurredAt", nullable = false)
     private LocalDateTime occurredAt;
 
     @Getter
