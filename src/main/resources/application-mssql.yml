@@ -23,7 +23,5 @@ spring:
   security:
     oauth2:
       resourceserver:
-        opaque-token:
-          introspection-uri: ${validation.url}
-          client-id: ${validation.clientId}
-          client-secret: ${validation.clientSecret}
+        jwt:
+          wk-set-uri: https://dev-kxpt8dcn-dagj15bx.us-5.auth0.com/.well-known/jwks.json
