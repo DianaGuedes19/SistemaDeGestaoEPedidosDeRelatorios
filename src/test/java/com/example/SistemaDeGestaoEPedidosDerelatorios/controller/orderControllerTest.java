@@ -173,4 +173,67 @@ class orderControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(dto)));
     }
 
+    @Test
+    void getOrdersByStatus_deveRetornar200EListaPorStatus() throws Exception {
+        // Arrange
+        orderDTOResponse o1 = new orderDTOResponse();
+        o1.setId(10L);
+        o1.setClientName("Ana");
+        o1.setClientEmail("ana@exemplo.com");
+        o1.setCreationDate(LocalDate.of(2025, 7, 15));
+        o1.setStatus(State.APROVADO);
+        o1.setValue(200.0);
+
+        orderDTOResponse o2 = new orderDTOResponse();
+        o2.setId(11L);
+        o2.setClientName("Bruno");
+        o2.setClientEmail("bruno@exemplo.com");
+        o2.setCreationDate(LocalDate.of(2025, 7, 16));
+        o2.setStatus(State.APROVADO);
+        o2.setValue(150.0);
+
+        List<orderDTOResponse> lista = Arrays.asList(o1, o2);
+
+        when(orderService1.findByStatus(State.APROVADO)).thenReturn(lista);
+
+        // Act & Assert
+        mockMvc.perform(get("/orders/status/{status}", "APROVADO")
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(lista)));
+    }
+
+    @Test
+    void getOrdersByDate_deveRetornar200EListaPorData() throws Exception {
+        // --- Arrange
+        LocalDate dataPesquisa = LocalDate.of(2025, 7, 17);
+
+        orderDTOResponse o1 = new orderDTOResponse();
+        o1.setId(20L);
+        o1.setClientName("Carlos");
+        o1.setClientEmail("carlos@exemplo.com");
+        o1.setCreationDate(dataPesquisa);
+        o1.setStatus(State.PENDENTE);
+        o1.setValue(90.0);
+
+        orderDTOResponse o2 = new orderDTOResponse();
+        o2.setId(21L);
+        o2.setClientName("Daniela");
+        o2.setClientEmail("daniela@exemplo.com");
+        o2.setCreationDate(dataPesquisa);
+        o2.setStatus(State.PENDENTE);
+        o2.setValue(120.0);
+
+        List<orderDTOResponse> lista = Arrays.asList(o1, o2);
+
+        when(orderService1.findByCreationDate(dataPesquisa)).thenReturn(lista);
+
+        // --- Act & Assert
+        mockMvc.perform(get("/orders/date/{date}", dataPesquisa.toString())
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(lista)));
+    }
+
+
 }

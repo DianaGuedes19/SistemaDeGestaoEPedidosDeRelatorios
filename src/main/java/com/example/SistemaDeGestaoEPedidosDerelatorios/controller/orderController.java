@@ -2,12 +2,14 @@ package com.example.SistemaDeGestaoEPedidosDerelatorios.controller;
 
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTORequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTOResponse;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.service.orderService;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.service.orderServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -39,5 +41,15 @@ public class orderController {
     @GetMapping("/{id}")
     public ResponseEntity<orderDTOResponse> getOrderByID (@PathVariable Long id){
         return new ResponseEntity<>(orderService1.getOrderByID(id),HttpStatus.OK);
+    }
+
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<orderDTOResponse>> getOrderByStatus (@PathVariable State status){
+        return new ResponseEntity<>(orderService1.findByStatus(status),HttpStatus.OK);
+    }
+
+    @GetMapping("/date/{date}")
+    public ResponseEntity<List<orderDTOResponse>> getOrderByStatus (@PathVariable LocalDate date){
+        return new ResponseEntity<>(orderService1.findByCreationDate(date),HttpStatus.OK);
     }
 }
