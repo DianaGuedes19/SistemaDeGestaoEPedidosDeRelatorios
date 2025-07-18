@@ -18,3 +18,11 @@ spring:
     show-sql: true
     properties:
       hibernate.format_sql: true
+
+security:
+  oauth2:
+    resourceserver:
+      opaque-token:
+        introspection-uri: ${validation.url}
+        client-id: my-client-id
+        client-secret: my-client-secret
