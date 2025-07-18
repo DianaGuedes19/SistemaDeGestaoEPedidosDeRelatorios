@@ -29,8 +29,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -64,11 +63,11 @@ class orderControllerTest {
 
     @Test
     void createOrder_deveRetornar201EODTO_NoBody() throws Exception {
-        // Arrange
+        // --- Arrange
         orderDTORequest req = new orderDTORequest();
         req.setClientName("Diana");
         req.setClientEmail("diana@gmail.com");
-        req.setCreationDate(LocalDate.of(2025,7,17));
+        req.setCreationDate(LocalDate.of(2025, 7, 17));
         req.setStatus(State.PENDENTE);
         req.setValue(130.2);
 
@@ -80,14 +79,47 @@ class orderControllerTest {
         resp.setStatus(req.getStatus());
         resp.setValue(req.getValue());
 
-        when(orderService1.createOrder(any(orderDTORequest.class))).thenReturn(resp);
+        resp.setClientValid(true);
+
+        resp.setValidationMessage(null);
+
+
+        when(orderService1.createOrder(any(orderDTORequest.class)))
+                .thenReturn(resp);
 
         // Act & Assert
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isCreated())
-                .andExpect(content().json(objectMapper.writeValueAsString(resp)));
+                .andExpect(content()
+                        .json(objectMapper.writeValueAsString(resp)));
+    }
+
+    @Test
+    void createOrder_deveRetornar400QuandoClienteInvalido() throws Exception {
+        // Arrange
+        orderDTORequest req = new orderDTORequest();
+        req.setClientName("Bob");
+        req.setClientEmail("bob#no-at-sign.com");
+        req.setCreationDate(LocalDate.of(2025, 7, 17));
+        req.setStatus(State.PENDENTE);
+        req.setValue(50.0);
+
+        orderDTOResponse resp = new orderDTOResponse();
+        resp.setClientValid(false);
+        resp.setValidationMessage("Wrong Email");
+
+        when(orderService1.createOrder(any(orderDTORequest.class)))
+                .thenReturn(resp);
+
+        // Act & Assert
+        mockMvc.perform(post("/orders")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(req)))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.clientValid").value(false))
+                .andExpect(jsonPath("$.validationMessage").value("Wrong Email"));
     }
 
     @Test
