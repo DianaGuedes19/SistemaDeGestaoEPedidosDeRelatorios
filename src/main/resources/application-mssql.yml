@@ -1,6 +1,8 @@
 
+
 validation:
-  url: https://run.mocky.io/v3/15b55d39-9a2c-4085-b542-05b098812a16
+  url: https://mocki.io/v1/f2458006-db81-453f-a250-b296a495adb3
+  listUrl: https://mocki.io/v1/cf019581-c65d-4a33-a496-06c751fdc377
 
 spring:
   datasource:

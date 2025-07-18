@@ -3,6 +3,7 @@ package com.example.SistemaDeGestaoEPedidosDerelatorios.service;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTORequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTOResponse;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.ValidationResponse;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.emailListResponse;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.validationRequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.Order;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.mapper.orderMapper;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,38 +25,32 @@ public class orderServiceImpl implements orderService {
     private final orderRepository orderRepository1;
     private final RestTemplate restTemplate;
     private final String validationUrl;
+    private final String listUrl;
 
-    public orderServiceImpl(orderRepository orderRepository1, RestTemplate restTemplate, @Value("${spring.validation.url}") String validationUrl) {
+    public orderServiceImpl(orderRepository orderRepository1, RestTemplate restTemplate, @Value("${validation.url}") String validationUrl,  @Value("${validation.listUrl}") String listUrl) {
         this.orderRepository1 = orderRepository1;
         this.restTemplate = restTemplate;
         this.validationUrl = validationUrl;
+        this.listUrl = listUrl;
     }
 
     @Override
     public orderDTOResponse createOrder(orderDTORequest order) {
 
-        // DTO -> Validation Request
-        validationRequest vr = new validationRequest(order.getClientName(), order.getClientEmail());
+        emailListResponse listResp = restTemplate.getForObject(listUrl, emailListResponse.class);
 
-        ValidationResponse resp;
-        try {
-            ResponseEntity<ValidationResponse> response = restTemplate.postForEntity(validationUrl, vr, ValidationResponse.class);
-            resp = response.getBody();
-        } catch (RestClientException ex) {
-            // timeout, falha de rede…
-            resp = new ValidationResponse(false, "Validation Error: " + ex.getMessage());
-        }
+        assert listResp != null;
+        List<String> valid = listResp.getValidEmails();
 
+        boolean exists = valid.contains(order.getClientEmail());
         Order order1 = orderMapper.toOrderEntity(order);
-
-        order1.setClientValid( resp != null && resp.getValid());
-        order1.setValidationMessage( resp != null ? resp.getReason() : "No Validation asnwer" );
-
+        order1.setClientValid(exists);
+        order1.setValidationMessage(exists ? "Existing Client" : "Client does not exists");
 
         orderRepository1.save(order1);
-
         return orderMapper.toDTOResponse(order1);
     }
+
 
     @Override
     public List<orderDTOResponse> getAllOders() {

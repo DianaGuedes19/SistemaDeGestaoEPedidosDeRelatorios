@@ -3,6 +3,7 @@ package com.example.SistemaDeGestaoEPedidosDerelatorios.service;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTORequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTOResponse;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.ValidationResponse;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.emailListResponse;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.validationRequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.Order;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +40,8 @@ class orderServiceImplTest {
     @Mock
     private RestTemplate restTemplate;
 
-    private final String validationUrl = "https://run.mocky.io/v3/15b55d39-9a2c-4085-b542-05b098812a16";
+    private final String validationUrl = "https://mocki.io/v1/f2458006-db81-453f-a250-b296a495adb3";
+    private final String listUrl = "https://mocki.io/v1/cf019581-c65d-4a33-a496-06c751fdc377";
 
 
     private orderServiceImpl orderService;
@@ -46,7 +49,7 @@ class orderServiceImplTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        orderService = new orderServiceImpl(orderRepository,restTemplate, validationUrl);
+        orderService = new orderServiceImpl(orderRepository,restTemplate, validationUrl,listUrl);
 
     }
 
@@ -62,25 +65,19 @@ class orderServiceImplTest {
         req.setValue(130.2);
 
 
-        ValidationResponse fakeResp = new ValidationResponse(true, "Existing Client");
-        ResponseEntity<ValidationResponse> fakeEntity = ResponseEntity.ok(fakeResp);
-        when(restTemplate.postForEntity(eq(validationUrl), any(validationRequest.class), eq(ValidationResponse.class)))
-                .thenReturn(fakeEntity);
+        emailListResponse listResp = new emailListResponse(Arrays.asList("diana@gmail.com", "outra@exemplo.com"));
+        when(restTemplate.getForObject(eq(listUrl), eq(emailListResponse.class)))
+                .thenReturn(listResp);
 
 
-        Order toSave = orderMapper.toOrderEntity(req);
+        ValidationResponse fakeValidation = new ValidationResponse(true, "Existing Client");
+        when(restTemplate.getForObject(eq(validationUrl), eq(ValidationResponse.class)))
+                .thenReturn(fakeValidation);
 
-        toSave.setClientValid(true);
-        toSave.setValidationMessage("Existing Client");
-        Order saved = new Order(1L,
-                toSave.getClientName(),
-                toSave.getClientEmail(),
-                toSave.getCreationDate(),
-                toSave.getStatus(),
-                toSave.getValue());
+
+        Order saved = orderMapper.toOrderEntity(req);
         saved.setClientValid(true);
-        saved.setValidationMessage("Existing Client");
-
+        saved.setValidationMessage(null);
         when(orderRepository.save(any(Order.class))).thenReturn(saved);
 
         // Act
@@ -91,32 +88,7 @@ class orderServiceImplTest {
         assertEquals("Diana", result.getClientName());
     }
 
-    @Test
-    void createOrder_whenValidationServiceFails_shouldReturnDtoWithError() {
-        // Arrange
-        orderDTORequest req = new orderDTORequest();
-        req.setClientName("Diana");
-        req.setClientEmail("diana@gmail.com");
-        req.setCreationDate(LocalDate.of(2025,7,17));
-        req.setStatus(State.PENDENTE);
-        req.setValue(130.2);
 
-        when(restTemplate.postForEntity(anyString(), any(validationRequest.class), eq(ValidationResponse.class))).thenThrow(new RestClientException("Timeout ao chamar validação"));
-
-        Order saved = new Order(42L,req.getClientName(),req.getClientEmail(),req.getCreationDate(),req.getStatus(),req.getValue(),false,"Validation Error"  );
-
-
-        when(orderRepository.save(any(Order.class))).thenReturn(saved);
-
-        // Act
-        orderDTOResponse result = orderService.createOrder(req);
-
-        // Assert
-        assertNotNull(result);
-        assertFalse(result.getClientValid());
-        assertTrue(result.getValidationMessage().startsWith("Validation Error"));
-
-    }
 
     @Test
     void getAllOrders() {

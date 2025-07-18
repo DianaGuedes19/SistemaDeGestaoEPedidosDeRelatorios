@@ -56,6 +56,7 @@ public class Order {
     private String validationMessage;
 
 
+
     // Constructor with the firsts parameters before the validation of users
     public Order(Long id, String clientName, String clientEmail, LocalDate creationDate, State status, double value) {
         this.id = id;

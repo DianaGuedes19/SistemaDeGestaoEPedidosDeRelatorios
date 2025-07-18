@@ -5,17 +5,15 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@AllArgsConstructor
+import java.util.List;
+
 @NoArgsConstructor
-public class ValidationResponse {
+@AllArgsConstructor
+public class emailListResponse {
 
     @Getter
     @Setter
-    private Boolean clientValid;
-
-    @Getter
-    @Setter
-    private String validationMessage;
+    private List<String> validEmails;
 
 
 }
