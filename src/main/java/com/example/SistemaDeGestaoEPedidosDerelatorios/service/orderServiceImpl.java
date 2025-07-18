@@ -43,8 +43,7 @@ public class orderServiceImpl implements orderService {
         Order order1 = orderMapper.toOrderEntity(order);
 
         if (!exists){
-            order1.setClientValid(false);
-            order1.setValidationMessage("Client doesn't exists");
+            throw new IllegalArgumentException("Client does not exists. Invalid email.");
         }
         else {
         order1.setClientValid(true);

@@ -100,26 +100,21 @@ class orderControllerTest {
     void createOrder_deveRetornar400QuandoClienteInvalido() throws Exception {
         // Arrange
         orderDTORequest req = new orderDTORequest();
-        req.setClientName("Bob");
-        req.setClientEmail("bob#no-at-sign.com");
-        req.setCreationDate(LocalDate.of(2025, 7, 17));
+        req.setClientName("Alice");
+        req.setClientEmail("alice@exemplo.com");
+        req.setCreationDate(LocalDate.of(2025, 7, 18));
         req.setStatus(State.PENDENTE);
-        req.setValue(50.0);
-
-        orderDTOResponse resp = new orderDTOResponse();
-        resp.setClientValid(false);
-        resp.setValidationMessage("Wrong Email");
+        req.setValue(100.0);
 
         when(orderService1.createOrder(any(orderDTORequest.class)))
-                .thenReturn(resp);
+                .thenThrow(new IllegalArgumentException("Email inválido"));
 
         // Act & Assert
         mockMvc.perform(post("/orders")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(req)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.clientValid").value(false))
-                .andExpect(jsonPath("$.validationMessage").value("Wrong Email"));
+                .andExpect(jsonPath("$.message").value("Email inválido"));
     }
 
     @Test

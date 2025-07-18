@@ -9,7 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/orders")
@@ -22,14 +26,18 @@ public class orderController {
     }
 
     @PostMapping()
-    public ResponseEntity<orderDTOResponse> createOrder (@RequestBody orderDTORequest orderRequest){
-        orderDTOResponse orderDTO = orderService1.createOrder(orderRequest);
+    public ResponseEntity<?> createOrder (@RequestBody orderDTORequest orderRequest){
 
-        if (!orderDTO.getClientValid()){
-            return ResponseEntity.badRequest().body(orderDTO);
+        try {
+            orderDTOResponse dto = orderService1.createOrder(orderRequest);
+            return ResponseEntity.status(CREATED).body(dto);
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(orderDTO);
+        catch (IllegalArgumentException ex) {
+            Map<String,String> err = Collections.singletonMap("message", ex.getMessage());
+            return ResponseEntity.badRequest().body(err);
+        }
+
     }
 
     @GetMapping("/allOrders")

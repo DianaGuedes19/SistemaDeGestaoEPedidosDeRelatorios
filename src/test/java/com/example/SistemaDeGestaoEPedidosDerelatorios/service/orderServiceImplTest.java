@@ -89,19 +89,11 @@ class orderServiceImplTest {
         when(restTemplate.getForObject(eq(listUrl), eq(emailListResponse.class)))
                 .thenReturn(listResp);
 
-        Order savedEntity = orderMapper.toOrderEntity(req);
-
-        savedEntity.setClientValid(false);
-        savedEntity.setValidationMessage("Client doesn't exist");
-        when(orderRepository.save(any(Order.class))).thenReturn(savedEntity);
-
-        // Act
-        orderDTOResponse result = orderService.createOrder(req);
-
-        // Assert
-        assertNotNull(result);
-        assertEquals("João", result.getClientName());
-        assertEquals("Client doesn't exists", result.getValidationMessage());
+        // Act & Assert
+        IllegalArgumentException ex = assertThrows(
+                IllegalArgumentException.class,
+                () -> orderService.createOrder(req)
+        );
     }
 
     @Test
