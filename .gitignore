@@ -31,3 +31,50 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Build output
+/target/
+/build/
+
+# Maven wrapper
+
+.mvn/wrapper/maven-wrapper.properties
+
+# Eclipse
+
+.settings/
+
+
+.idea/
+/out/
+
+# VS Code
+
+
+# Logs
+*.log
+logs/
+spring.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Environment variables
+.env
+
+# Credentials/config (separar via application-*.yml)
+/application-*.yml
+
+# Docker
+docker-compose.override.yml
+
+# Others
+.cache/
+*.bak
+
