@@ -1,7 +1,6 @@
 
 
 validation:
-  url: https://mocki.io/v1/f2458006-db81-453f-a250-b296a495adb3
   listUrl: https://mocki.io/v1/cf019581-c65d-4a33-a496-06c751fdc377
   clientId: my-client-id
   clientSecret: my-client-secret

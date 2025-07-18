@@ -2,34 +2,24 @@ package com.example.SistemaDeGestaoEPedidosDerelatorios.service;
 
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTORequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTOResponse;
-import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.ValidationResponse;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.emailListResponse;
-import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.validationRequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.Order;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.mapper.orderMapper;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.repository.orderRepository;
-import org.aspectj.weaver.ast.Or;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.Spy;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.mock;
+
 import static org.mockito.Mockito.when;
 
 class orderServiceImplTest {
@@ -40,7 +30,6 @@ class orderServiceImplTest {
     @Mock
     private RestTemplate restTemplate;
 
-    private final String validationUrl = "https://mocki.io/v1/f2458006-db81-453f-a250-b296a495adb3";
     private final String listUrl = "https://mocki.io/v1/cf019581-c65d-4a33-a496-06c751fdc377";
 
 
@@ -49,7 +38,7 @@ class orderServiceImplTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        orderService = new orderServiceImpl(orderRepository,restTemplate, validationUrl,listUrl);
+        orderService = new orderServiceImpl(orderRepository,restTemplate,listUrl);
 
     }
 
@@ -64,21 +53,16 @@ class orderServiceImplTest {
         req.setStatus(State.PENDENTE);
         req.setValue(130.2);
 
-
-        emailListResponse listResp = new emailListResponse(Arrays.asList("diana@gmail.com", "outra@exemplo.com"));
+        emailListResponse listResp = new emailListResponse(
+                Arrays.asList("diana@gmail.com", "outra@exemplo.com")
+        );
         when(restTemplate.getForObject(eq(listUrl), eq(emailListResponse.class)))
                 .thenReturn(listResp);
 
-
-        ValidationResponse fakeValidation = new ValidationResponse(true, "Existing Client");
-        when(restTemplate.getForObject(eq(validationUrl), eq(ValidationResponse.class)))
-                .thenReturn(fakeValidation);
-
-
-        Order saved = orderMapper.toOrderEntity(req);
-        saved.setClientValid(true);
-        saved.setValidationMessage(null);
-        when(orderRepository.save(any(Order.class))).thenReturn(saved);
+        Order savedEntity = orderMapper.toOrderEntity(req);
+        savedEntity.setClientValid(true);
+        savedEntity.setValidationMessage("Existing Client. Order created with success!");
+        when(orderRepository.save(any(Order.class))).thenReturn(savedEntity);
 
         // Act
         orderDTOResponse result = orderService.createOrder(req);
@@ -89,6 +73,36 @@ class orderServiceImplTest {
     }
 
 
+    @Test
+    void createOrder_nonExistingEmail_returnsBadDto() {
+        // Arrange
+        orderDTORequest req = new orderDTORequest();
+        req.setClientName("João");
+        req.setClientEmail("joao@invalido.com");
+        req.setCreationDate(LocalDate.of(2025, 7, 17));
+        req.setStatus(State.PENDENTE);
+        req.setValue(50.0);
+
+        emailListResponse listResp = new emailListResponse(
+                Collections.singletonList("outra@exemplo.com")
+        );
+        when(restTemplate.getForObject(eq(listUrl), eq(emailListResponse.class)))
+                .thenReturn(listResp);
+
+        Order savedEntity = orderMapper.toOrderEntity(req);
+
+        savedEntity.setClientValid(false);
+        savedEntity.setValidationMessage("Client doesn't exist");
+        when(orderRepository.save(any(Order.class))).thenReturn(savedEntity);
+
+        // Act
+        orderDTOResponse result = orderService.createOrder(req);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals("João", result.getClientName());
+        assertEquals("Client doesn't exists", result.getValidationMessage());
+    }
 
     @Test
     void getAllOrders() {

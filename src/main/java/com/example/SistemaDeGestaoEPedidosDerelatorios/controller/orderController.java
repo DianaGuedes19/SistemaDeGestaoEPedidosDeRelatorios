@@ -28,7 +28,7 @@ public class orderController {
             return ResponseEntity.badRequest().body(orderDTO);
         }
 
-        return new ResponseEntity<>(orderService1.createOrder(orderRequest),HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(orderDTO);
     }
 
     @GetMapping("/allOrders")

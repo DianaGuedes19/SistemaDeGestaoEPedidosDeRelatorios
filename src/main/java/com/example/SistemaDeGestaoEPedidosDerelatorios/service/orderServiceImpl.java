@@ -2,19 +2,13 @@ package com.example.SistemaDeGestaoEPedidosDerelatorios.service;
 
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTORequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTOResponse;
-import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.ValidationResponse;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.emailListResponse;
-import com.example.SistemaDeGestaoEPedidosDerelatorios.POJOS.validationRequest;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.Order;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.mapper.orderMapper;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.repository.orderRepository;
-import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,13 +18,12 @@ public class orderServiceImpl implements orderService {
 
     private final orderRepository orderRepository1;
     private final RestTemplate restTemplate;
-    private final String validationUrl;
     private final String listUrl;
 
-    public orderServiceImpl(orderRepository orderRepository1, RestTemplate restTemplate, @Value("${validation.url}") String validationUrl,  @Value("${validation.listUrl}") String listUrl) {
+    public orderServiceImpl(orderRepository orderRepository1, RestTemplate restTemplate,  @Value("${validation.listUrl}") String listUrl) {
         this.orderRepository1 = orderRepository1;
         this.restTemplate = restTemplate;
-        this.validationUrl = validationUrl;
+
         this.listUrl = listUrl;
     }
 
@@ -44,8 +37,14 @@ public class orderServiceImpl implements orderService {
 
         boolean exists = valid.contains(order.getClientEmail());
         Order order1 = orderMapper.toOrderEntity(order);
-        order1.setClientValid(exists);
-        order1.setValidationMessage(exists ? "Existing Client" : "Client does not exists");
+
+        if (!exists){
+            order1.setClientValid(false);
+            order1.setValidationMessage("Client doesn't exists");
+        }
+        else {
+        order1.setClientValid(true);
+        order1.setValidationMessage("Existing Client. Order created with success!"); }
 
         orderRepository1.save(order1);
         return orderMapper.toDTOResponse(order1);
