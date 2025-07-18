@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "ErrorLog")
@@ -22,13 +23,28 @@ public class ErrorLog {
 
     @Getter
     @Setter
+    @Column(name = "OccurredAt", nullable = false)
+    private LocalDateTime occurredAt;
+
+    @Getter
+    @Setter
+    @Column(name = "Path", nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    private String path;
+
+    @Getter
+    @Setter
+    @Column(name = "Exception", nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    private String exception;
+
+    @Getter
+    @Setter
     @Column(name = "Message", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String message;
 
     @Getter
     @Setter
-    @Column(name = "LoggedAt", nullable = false)
-    private LocalDate loggedAt;
+    @Column(name = "StackTrace", nullable = false, columnDefinition = "NVARCHAR(MAX)")
+    private String stackTrace;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "OrderId", nullable = true, foreignKey = @ForeignKey(name = "FK_Error_Order"))
