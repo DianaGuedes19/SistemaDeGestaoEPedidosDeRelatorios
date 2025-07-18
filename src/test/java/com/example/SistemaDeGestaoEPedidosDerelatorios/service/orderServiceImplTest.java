@@ -154,4 +154,37 @@ class orderServiceImplTest {
         assertEquals("Order not found " + id, ex.getMessage());
 
     }
+
+    @Test
+    void findByState_returnsDtosWhenFound() {
+        // Arrange
+        Order o1 = new Order(1L, "CliA", "a@exa.com", LocalDate.of(2025,7,18), State.PENDENTE, 10.0);
+        Order o2 = new Order(2L, "CliB", "b@exa.com", LocalDate.of(2025,7,19), State.PENDENTE, 20.0);
+        List<Order> domainList = Arrays.asList(o1, o2);
+
+        when(orderRepository.findByState(State.PENDENTE))
+                .thenReturn(domainList);
+
+        // Act
+        List<orderDTOResponse> result = orderService.findByState(State.PENDENTE);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(2, result.size());
+        assertTrue(result.stream().allMatch(dto -> dto.getStatus() == State.PENDENTE && (dto.getClientName().equals("CliA") || dto.getClientName().equals("CliB"))));
+    }
+
+    @Test
+    void findByState_returnsEmptyListWhenNoneFound() {
+        // Arrange
+        when(orderRepository.findByState(State.PENDENTE))
+                .thenReturn(Collections.emptyList());
+
+        // Act
+        List<orderDTOResponse> result = orderService.findByState(State.PENDENTE);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
 }
