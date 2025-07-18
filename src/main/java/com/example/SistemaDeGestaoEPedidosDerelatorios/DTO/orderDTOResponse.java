@@ -38,4 +38,12 @@ public class orderDTOResponse {
     @Getter
     @Setter
     private double value;
+
+    @Getter
+    @Setter
+    private Boolean clientValid;
+
+    @Getter
+    @Setter
+    private String validationMessage;
 }

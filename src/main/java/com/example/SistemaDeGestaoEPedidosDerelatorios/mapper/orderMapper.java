@@ -15,6 +15,8 @@ public class orderMapper {
         orderDTOResponse1.setCreationDate(order.getCreationDate());
         orderDTOResponse1.setStatus(order.getStatus());
         orderDTOResponse1.setValue(order.getValue());
+        orderDTOResponse1.setClientValid(order.getClientValid());
+        orderDTOResponse1.setValidationMessage(order.getValidationMessage());
 
         return orderDTOResponse1;
     }
