@@ -1,7 +1,7 @@
 package com.example.SistemaDeGestaoEPedidosDerelatorios.controller;
 
-import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTORequest;
-import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTOResponse;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.order.orderDTORequest;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.order.orderDTOResponse;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.service.orderService;
 

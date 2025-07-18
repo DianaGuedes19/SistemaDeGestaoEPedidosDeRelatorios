@@ -1,10 +1,9 @@
 package com.example.SistemaDeGestaoEPedidosDerelatorios.controller;
 
-import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTORequest;
-import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.orderDTOResponse;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.order.orderDTORequest;
+import com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.order.orderDTOResponse;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
 import com.example.SistemaDeGestaoEPedidosDerelatorios.service.orderService;
-import com.example.SistemaDeGestaoEPedidosDerelatorios.service.orderServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

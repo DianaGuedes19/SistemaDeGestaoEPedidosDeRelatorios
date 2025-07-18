@@ -1,14 +1,22 @@
-package com.example.SistemaDeGestaoEPedidosDerelatorios.DTO;
+package com.example.SistemaDeGestaoEPedidosDerelatorios.DTO.order;
 
 import com.example.SistemaDeGestaoEPedidosDerelatorios.domain.State;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
 
-public class orderDTORequest {
+@AllArgsConstructor
+@NoArgsConstructor
+public class orderDTOResponse {
+
+    @Getter
+    @Setter
+    private Long id;
 
     @Getter
     @Setter
@@ -30,4 +38,13 @@ public class orderDTORequest {
     @Getter
     @Setter
     private double value;
+
+    @Getter
+    @Setter
+    private Boolean clientValid;
+
+    @Getter
+    @Setter
+    private String validationMessage;
+
 }
