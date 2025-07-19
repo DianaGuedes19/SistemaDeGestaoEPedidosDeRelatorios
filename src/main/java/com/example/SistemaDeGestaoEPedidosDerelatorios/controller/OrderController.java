@@ -56,7 +56,7 @@ public class OrderController {
     }
 
     @GetMapping("/date/{date}")
-    public ResponseEntity<List<orderDTOResponse>> getOrderByStatus (@PathVariable LocalDate date){
+    public ResponseEntity<List<orderDTOResponse>> getOrderByDate(@PathVariable LocalDate date){
         return new ResponseEntity<>(orderService1.findByCreationDate(date),HttpStatus.OK);
     }
 }
