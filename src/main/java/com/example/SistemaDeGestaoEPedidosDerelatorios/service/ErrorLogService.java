@@ -10,17 +10,30 @@ import java.time.LocalDateTime;
 @Service
 public class ErrorLogService {
     private final errorLogRepository repo;
+    private final EmailService emailService;
 
-    public ErrorLogService(errorLogRepository repo) {
+
+    public ErrorLogService(errorLogRepository repo, EmailService emailService) {
         this.repo = repo;
+        this.emailService = emailService;
     }
 
-
-    public ErrorLog logError(Exception e, Order order) {
+    public void logError(Exception e, Order order) {
         ErrorLog log = new ErrorLog();
         log.setMessage(e.getMessage());
         log.setTimestamp(LocalDateTime.now());
-        log.setOrder(order);  // pode ser nulo
-        return repo.save(log);
+        log.setOrder(order);
+        repo.save(log);
+
+        String subject = "Erro no sistema: " + e.getClass().getSimpleName();
+        String body = "Ocorreu um erro em " + LocalDateTime.now() + "\n\n" +
+                "Mensagem: " + e.getMessage() + "\n" +
+                "Pedido: " + (order != null ? order.getId() : "N/A") + "\n\n" +
+                "Por favor verifique o log completo no servidor.";
+        emailService.sendSimpleMessage(
+                "dianaguedesmarketing@gmail.com",
+                subject,
+                body
+        );;
     }
 }
