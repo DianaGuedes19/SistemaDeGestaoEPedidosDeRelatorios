@@ -23,34 +23,40 @@ public class orderServiceImpl implements orderService {
     private final orderRepository orderRepository1;
     private final RestTemplate restTemplate;
     private final String listUrl;
+    private final ErrorLogService errorLogService;
 
-    public orderServiceImpl(orderRepository orderRepository1, RestTemplate restTemplate,  @Value("${validation.listUrl}") String listUrl) {
+    public orderServiceImpl(orderRepository orderRepository1, RestTemplate restTemplate,  @Value("${validation.listUrl}") String listUrl, ErrorLogService errorLogService) {
         this.orderRepository1 = orderRepository1;
         this.restTemplate = restTemplate;
-
+        this.errorLogService = errorLogService;
         this.listUrl = listUrl;
     }
 
     @Override
     public orderDTOResponse createOrder(orderDTORequest order) {
 
-        emailListResponse listResp = restTemplate.getForObject(listUrl, emailListResponse.class);
+        try {
+            emailListResponse listResp = restTemplate.getForObject(listUrl, emailListResponse.class);
+            assert listResp != null;
+            List<String> valid = listResp.getValidEmails();
 
-        assert listResp != null;
-        List<String> valid = listResp.getValidEmails();
+            boolean exists = valid.contains(order.getClientEmail());
+            Order orderEntity = orderMapper.toOrderEntity(order);
 
-        boolean exists = valid.contains(order.getClientEmail());
-        Order order1 = orderMapper.toOrderEntity(order);
+            if (!exists) {
+                throw new IllegalArgumentException("Client does not exist. Invalid email.");
+            } else {
+                orderEntity.setClientValid(true);
+                orderEntity.setValidationMessage("Existing Client. Order created with success!");
+            }
 
-        if (!exists){
-            throw new IllegalArgumentException("Client does not exists. Invalid email.");
+            orderRepository1.save(orderEntity);
+            return orderMapper.toDTOResponse(orderEntity);
+
+        } catch (Exception e) {
+            errorLogService.logError(e, null);
+            throw e;
         }
-        else {
-        order1.setClientValid(true);
-        order1.setValidationMessage("Existing Client. Order created with success!"); }
-
-        orderRepository1.save(order1);
-        return toDTOResponse(order1);
     }
 
 

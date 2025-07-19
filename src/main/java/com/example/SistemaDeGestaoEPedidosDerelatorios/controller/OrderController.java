@@ -17,11 +17,11 @@ import static org.springframework.http.HttpStatus.CREATED;
 
 @RestController
 @RequestMapping("/orders")
-public class orderController {
+public class OrderController {
 
     private final orderService orderService1;
 
-    public orderController(orderService orderService) {
+    public OrderController(orderService orderService) {
         this.orderService1 = orderService;
     }
 

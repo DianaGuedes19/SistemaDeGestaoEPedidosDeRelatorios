@@ -16,35 +16,23 @@ public class ErrorLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Getter
     private Long id;
 
-    @Getter
-    @Setter
-    private LocalDateTime occurredAt;
 
     @Getter
     @Setter
-    @Column(name = "Path", nullable = false, columnDefinition = "NVARCHAR(MAX)")
-    private String path;
+    @Column(nullable = false, columnDefinition = "NVARCHAR(MAX)")
 
-    @Getter
-    @Setter
-    @Column(name = "Exception", nullable = false, columnDefinition = "NVARCHAR(MAX)")
-    private String exception;
-
-    @Getter
-    @Setter
-    @Column(name = "Message", nullable = false, columnDefinition = "NVARCHAR(MAX)")
     private String message;
 
     @Getter
     @Setter
-    @Column(name = "StackTrace", nullable = false, columnDefinition = "NVARCHAR(MAX)")
-    private String stackTrace;
+    private LocalDateTime timestamp;
 
+    @Getter
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "OrderId", nullable = true, foreignKey = @ForeignKey(name = "FK_Error_Order"))
+    @JoinColumn(name = "order_id", nullable = true, foreignKey = @ForeignKey(name = "FK_Error_Order"))
     private Order order;
 
 }

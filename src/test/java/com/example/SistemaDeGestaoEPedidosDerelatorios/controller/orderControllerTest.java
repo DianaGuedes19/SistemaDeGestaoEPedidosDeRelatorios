@@ -44,7 +44,7 @@ class orderControllerTest {
     private orderService orderService1;
 
     @InjectMocks
-    private orderController controller;
+    private OrderController controller;
 
     @BeforeEach
     void setup() {
